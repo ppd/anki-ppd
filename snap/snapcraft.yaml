@@ -1,0 +1,76 @@
+name: anki-ppd
+base: core20 
+version: "2.1.48"
+summary: Extensible flashcard learning program.
+description: |
+  Anki is a program which makes remembering things easy. Because it's a lot
+  more efficient than traditional study methods, you can either greatly
+  decrease your time spent studying, or greatly increase the amount you learn.
+
+  This snap ships the upstream binary releases with as few changes as possible.
+  If you are looking for actual builds from source, consider the anki-woodrow snap.
+  This snap is not affiliated with the upstream project in any way.
+
+grade: stable
+confinement: strict
+compression: lzo
+
+apps:
+  anki:
+    command: usr/share/anki/bin/Anki
+    command-chain:
+      - bin/set-platformtheme
+      - bin/remember-ld-library-path
+    desktop: usr/share/applications/anki.desktop
+    plugs:
+      - home
+      - opengl
+      - network
+      - browser-support
+      - audio-playback
+      - audio-record
+    environment:
+      ANKI_BASE: $SNAP_USER_COMMON/anki
+      QTWEBENGINE_DISABLE_SANDBOX: 1
+      LD_LIBRARY_PATH: $SNAP/usr/lib/x86_64-linux-gnu/samba
+    extensions:
+      - gnome-3-38
+
+parts:
+  launchers:
+    plugin: dump
+    source: launchers/
+    organize: 
+      "*": bin/
+
+  wrappers:
+    plugin: dump
+    source: wrappers/
+    organize: 
+      "*": wrappers/
+
+  anki:
+    plugin: nil
+    source: https://github.com/ankitects/anki/releases/download/2.1.48/anki-2.1.48-linux.tar.bz2
+    source-checksum: sha256/d59bc2f023e760ccc2c71ae4a3515f993bca8894feec184e764e76ccb4e72c61
+    stage-packages:
+      - libnss3
+      - libxcb-icccm4
+      - libxcb-image0
+      - libxcb-keysyms1
+      - libxcb-randr0
+      - libxcb-render-util0
+      - libxcb-shape0
+      - libxcb-xinerama0
+      - libxcb-xkb1
+      - libxkbcommon-x11-0
+      - mpv
+      - libxv1
+      - samba-libs
+    override-build: |
+      export PREFIX="$SNAPCRAFT_PART_INSTALL/usr"
+      install -m 755 /dev/null /usr/bin/xdg-mime
+      ./install.sh
+      sed -i -e 's|Icon=anki|Icon=${SNAP}/usr/share/pixmaps/anki.png|g' \
+        "$PREFIX/share/applications/anki.desktop"
+      rm "$PREFIX/bin/anki"
