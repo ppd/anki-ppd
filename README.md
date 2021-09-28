@@ -1,5 +1,7 @@
 # anki-ppd: Snap package for Anki
 
+[![anki-ppd](https://snapcraft.io/anki-ppd/badge.svg)](https://snapcraft.io/anki-ppd)
+
 Anki is a program which makes remembering things easy. Because it's a lot
 more efficient than traditional study methods, you can either greatly
 decrease your time spent studying, or greatly increase the amount you learn.
