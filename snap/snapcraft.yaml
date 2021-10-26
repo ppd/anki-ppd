@@ -1,6 +1,6 @@
 name: anki-ppd
 base: core20 
-version: "2.1.48"
+version: "2.1.49"
 summary: Extensible flashcard learning program.
 description: |
   Anki is a program which makes remembering things easy. Because it's a lot
@@ -51,8 +51,8 @@ parts:
 
   anki:
     plugin: nil
-    source: https://github.com/ankitects/anki/releases/download/2.1.48/anki-2.1.48-linux.tar.bz2
-    source-checksum: sha256/d59bc2f023e760ccc2c71ae4a3515f993bca8894feec184e764e76ccb4e72c61
+    source: https://github.com/ankitects/anki/releases/download/2.1.49/anki-2.1.49-linux.tar.bz2
+    source-checksum: sha256/b86dfd83d0979eab80ac5b31b451d65a80da370bbccb628a87e4aa1adf1aaa2d
     stage-packages:
       - libnss3
       - libxcb-icccm4
