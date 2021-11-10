@@ -15,13 +15,15 @@ grade: stable
 confinement: strict
 compression: lzo
 
+layout:
+  /usr/share/qt5:
+      symlink: $SNAP/kf5/usr/share/qt5
+
 apps:
   anki:
-    command: usr/share/anki/bin/Anki
+    command: bin/anki
     command-chain:
-      - bin/set-platformtheme
       - bin/remember-ld-library-path
-    desktop: usr/share/applications/anki.desktop
     plugs:
       - home
       - opengl
@@ -33,8 +35,19 @@ apps:
       ANKI_BASE: $SNAP_USER_COMMON/anki
       QTWEBENGINE_DISABLE_SANDBOX: 1
       LD_LIBRARY_PATH: $SNAP/usr/lib/x86_64-linux-gnu/samba
+      PYTHONPATH: $SNAP/usr/lib/python3/dist-packages
     extensions:
-      - gnome-3-38
+      - kde-neon
+
+package-repositories:
+-   type: apt
+    components:
+    - main
+    suites:
+    - focal
+    key-id: 444DABCF3667D0283F894EDDE6D4736255751E5D
+    url: http://origin.archive.neon.kde.org/user
+    key-server: keyserver.ubuntu.com
 
 parts:
   launchers:
@@ -50,9 +63,7 @@ parts:
       "*": wrappers/
 
   anki:
-    plugin: nil
-    source: https://github.com/ankitects/anki/releases/download/2.1.49/anki-2.1.49-linux.tar.bz2
-    source-checksum: sha256/b86dfd83d0979eab80ac5b31b451d65a80da370bbccb628a87e4aa1adf1aaa2d
+    plugin: python
     stage-packages:
       - libnss3
       - libxcb-icccm4
@@ -67,10 +78,25 @@ parts:
       - mpv
       - libxv1
       - samba-libs
-    override-build: |
-      export PREFIX="$SNAPCRAFT_PART_INSTALL/usr"
-      install -m 755 /dev/null /usr/bin/xdg-mime
-      ./install.sh
-      sed -i -e 's|Icon=anki|Icon=${SNAP}/usr/share/pixmaps/anki.png|g' \
-        "$PREFIX/share/applications/anki.desktop"
-      rm "$PREFIX/bin/anki"
+      - python3-pyqt5
+      - python3-pyqt5.qtwebengine
+      - python3-pyqt5.qtwebchannel
+    python-packages:
+      - aqt==2.1.49
+    prime:
+      - -lib/python3.8/site-packages/PyQt*
+
+  cleanup:
+    after: [launchers, wrappers, anki]
+    plugin: nil
+    build-snaps: [kde-frameworks-5-qt-5-15-3-core20]
+    override-prime: |
+        set -eux
+        for snap in "kde-frameworks-5-qt-5-15-3-core20"; do  # List all content-snaps you're using here
+            cd "/snap/$snap/current" && find . -type f,l -exec rm -f "$SNAPCRAFT_PRIME/{}" "$SNAPCRAFT_PRIME/usr/{}" \;
+        done
+        for CRUFT in bug lintian man; do
+            rm -rf $SNAPCRAFT_PRIME/usr/share/$CRUFT
+        done
+        find $SNAPCRAFT_PRIME/usr/share/doc/ -type f -not -name 'copyright' -delete
+        find $SNAPCRAFT_PRIME/usr/share -type d -empty -delete

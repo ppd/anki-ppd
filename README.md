@@ -6,7 +6,7 @@ Anki is a program which makes remembering things easy. Because it's a lot
 more efficient than traditional study methods, you can either greatly
 decrease your time spent studying, or greatly increase the amount you learn.
 
-This snap ships the upstream binary releases with as few changes as possible.
+This snap ships the upstream pre-built python package with as few changes as possible.
 If you are looking for actual builds from source, consider the `anki-woodrow` snap (https://snapcraft.io/anki-woodrow).
 This snap is not affiliated with the upstream project in any way.
 
