@@ -81,18 +81,20 @@ parts:
       - python3-pyqt5
       - python3-pyqt5.qtwebengine
       - python3-pyqt5.qtwebchannel
+      - python3-pyqt5.qtmultimedia
+      - lame
     python-packages:
-      - aqt==2.1.49
+      - aqt==${SNAPCRAFT_PROJECT_VERSION}
     prime:
       - -lib/python3.8/site-packages/PyQt*
 
   cleanup:
     after: [launchers, wrappers, anki]
     plugin: nil
-    build-snaps: [kde-frameworks-5-qt-5-15-3-core20]
+    build-snaps: [kde-frameworks-5-91-qt-5-15-3-core20]
     override-prime: |
         set -eux
-        for snap in "kde-frameworks-5-qt-5-15-3-core20"; do  # List all content-snaps you're using here
+        for snap in "kde-frameworks-5-91-qt-5-15-3-core20"; do  # List all content-snaps you're using here
             cd "/snap/$snap/current" && find . -type f,l -exec rm -f "$SNAPCRAFT_PRIME/{}" "$SNAPCRAFT_PRIME/usr/{}" \;
         done
         for CRUFT in bug lintian man; do
