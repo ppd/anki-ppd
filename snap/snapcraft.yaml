@@ -83,6 +83,8 @@ parts:
       - PATH: "$VIRTUAL_ENV/bin:$PATH"
     python-packages: 
       - aqt==${SNAPCRAFT_PROJECT_VERSION}
+    prime:
+      - -bin/python*
 
   cleanup:
     after: [launchers, wrappers, anki]
