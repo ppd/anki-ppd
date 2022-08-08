@@ -1,6 +1,6 @@
 name: anki-ppd
-base: core20 
-version: "2.1.49"
+base: core22
+version: "2.1.54"
 summary: Extensible flashcard learning program.
 description: |
   Anki is a program which makes remembering things easy. Because it's a lot
@@ -17,7 +17,7 @@ compression: lzo
 
 layout:
   /usr/share/qt5:
-      symlink: $SNAP/kf5/usr/share/qt5
+      symlink: $SNAP/usr/share/qt5
 
 apps:
   anki:
@@ -34,20 +34,13 @@ apps:
     environment:
       ANKI_BASE: $SNAP_USER_COMMON/anki
       QTWEBENGINE_DISABLE_SANDBOX: 1
-      LD_LIBRARY_PATH: $SNAP/usr/lib/x86_64-linux-gnu/samba
-      PYTHONPATH: $SNAP/usr/lib/python3/dist-packages
+      LD_LIBRARY_PATH: $LD_LIBRARY_PATH:$SNAP/usr/lib/x86_64-linux-gnu/samba:$SNAP/usr/lib/x86_64-linux-gnu/blas:$SNAP/usr/lib/x86_64-linux-gnu/lapack
+      PYTHONPATH: $SNAP/usr/lib/python3/dist-packages:$SNAP/lib/python3.10/site-packages
+      QT_PLUGIN_PATH: $SNAP/usr/lib/x86_64-linux-gnu/qt5/plugins:$SNAP/usr/lib/x86_64-linux-gnu
+      QTWEBENGINEPROCESS_PATH: $SNAP/usr/lib/x86_64-linux-gnu/qt5/libexec/QtWebEngineProcess
+      DISABLE_WAYLAND: 1
     extensions:
-      - kde-neon
-
-package-repositories:
--   type: apt
-    components:
-    - main
-    suites:
-    - focal
-    key-id: 444DABCF3667D0283F894EDDE6D4736255751E5D
-    url: http://origin.archive.neon.kde.org/user
-    key-server: keyserver.ubuntu.com
+      - gnome
 
 parts:
   launchers:
@@ -64,6 +57,7 @@ parts:
 
   anki:
     plugin: python
+    source: .
     stage-packages:
       - libnss3
       - libxcb-icccm4
@@ -82,23 +76,21 @@ parts:
       - python3-pyqt5.qtwebengine
       - python3-pyqt5.qtwebchannel
       - python3-pyqt5.qtmultimedia
+      - libqt5multimedia5-plugins
       - lame
-    python-packages:
+    build-environment:
+      - VIRTUAL_ENV: "$CRAFT_PART_INSTALL"
+      - PATH: "$VIRTUAL_ENV/bin:$PATH"
+    python-packages: 
       - aqt==${SNAPCRAFT_PROJECT_VERSION}
-    prime:
-      - -lib/python3.8/site-packages/PyQt*
 
   cleanup:
     after: [launchers, wrappers, anki]
     plugin: nil
-    build-snaps: [kde-frameworks-5-91-qt-5-15-3-core20]
     override-prime: |
         set -eux
-        for snap in "kde-frameworks-5-91-qt-5-15-3-core20"; do  # List all content-snaps you're using here
-            cd "/snap/$snap/current" && find . -type f,l -exec rm -f "$SNAPCRAFT_PRIME/{}" "$SNAPCRAFT_PRIME/usr/{}" \;
-        done
         for CRUFT in bug lintian man; do
-            rm -rf $SNAPCRAFT_PRIME/usr/share/$CRUFT
+            rm -rf $CRAFT_PRIME/usr/share/$CRUFT
         done
-        find $SNAPCRAFT_PRIME/usr/share/doc/ -type f -not -name 'copyright' -delete
-        find $SNAPCRAFT_PRIME/usr/share -type d -empty -delete
+        find $CRAFT_PRIME/usr/share/doc/ -type f -not -name 'copyright' -delete
+        find $CRAFT_PRIME/usr/share -type d -empty -delete
